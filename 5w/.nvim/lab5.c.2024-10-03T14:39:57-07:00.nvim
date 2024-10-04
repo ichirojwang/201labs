@@ -1,0 +1,13 @@
+#include <stdint.h>
+
+
+struct header {
+  uint64_t size;
+  struct header *next;
+};
+
+int main() {
+
+  struct header *first = 
+
+}

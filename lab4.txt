@@ -1,0 +1,23 @@
+
+int size
+int index = 0
+char array[5]
+
+while 1
+
+receive input
+
+if size < 5
+char array append input
+size++
+
+else
+array[index] = input
+index++
+
+if strcmp input, print
+for i=0; i<size; i++
+index =index % 5
+print array[index++]
+
+
