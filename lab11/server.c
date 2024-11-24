@@ -126,8 +126,11 @@ static void *run_client(void *args) {
       new_node->data = malloc(BUF_SIZE);
       memcpy(new_node->data, msg_buf, BUF_SIZE);
 
-      struct list_handle *list_handle = cargs->list_handle;
-      // TODO: Safely use add_to_list to add new_node to the list
+      // struct list_handle *list_handle = cargs->list_handle;
+      //  TODO: Safely use add_to_list to add new_node to the list
+      pthread_mutex_lock(cargs->list_lock);
+      { add_to_list(cargs->list_handle, new_node); }
+      pthread_mutex_unlock(cargs->list_lock);
     }
   }
 
@@ -162,6 +165,8 @@ static void *run_acceptor(void *args) {
         client_args[num_clients].run = true;
         client_args[num_clients].list_handle = aargs->list_handle;
         client_args[num_clients].list_lock = aargs->list_lock;
+        pthread_create(&threads[num_clients], NULL, run_client,
+                       &client_args[num_clients]);
         num_clients++;
 
         // TODO: Create a new thread to handle the client
@@ -204,6 +209,14 @@ int main() {
   pthread_create(&acceptor_thread, NULL, run_acceptor, &aargs);
 
   // TODO: Wait until enough messages are received
+  while (true) {
+    pthread_mutex_lock(&list_mutex);
+    if (list_handle.count >= MAX_CLIENTS * NUM_MSG_PER_CLIENT) {
+      pthread_mutex_unlock(&list_mutex);
+      break;
+    }
+    pthread_mutex_unlock(&list_mutex);
+  }
 
   aargs.run = false;
   pthread_join(acceptor_thread, NULL);

@@ -43,7 +43,7 @@ void *handle_client(void *arg) {
   while ((num_read = read(cfd, buf, BUF_SIZE)) > 0) {
 
     buf[num_read] = '\0';
-    printf("Client ID: %d: %s", id, buf);
+    printf("Client ID: %d: %s.\n", id, buf);
 
     pthread_mutex_lock(&count_mutex);
     printf("Total message count: %d\n", ++total_message_count);
